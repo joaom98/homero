@@ -13,8 +13,18 @@ double Desejado, Entrada, Saida;
 //Specify the links and initial tuning parameters
 PID myPID(&Entrada, &Saida, &Desejado, 2000, 500, 1, DIRECT);
 
-int WindowSize = 10000;
+int WindowSize = 1000;
 unsigned long windowStartTime;
+
+double readTemperature (LM35 sensor, int samples) {
+  double soma = 0;
+   for ( int i=0 ; i < samples ; i++ ) {
+      soma += sensor.readCelsius(); 
+   }
+
+   return soma / samples;
+}
+
 void setup()
 {
 
@@ -25,7 +35,7 @@ void setup()
   windowStartTime = millis();
 
   //initialize the variables we're linked to
-  Desejado = 35;
+  Desejado = 15;
 
   //tell the PID to range between 0 and the full window size
   myPID.SetOutputLimits(0, WindowSize);
@@ -37,12 +47,12 @@ void setup()
 
 void loop()
 {
-  C = lm35.readCelsius();       // Reading the temperature in Celsius degrees 
+  C = readTemperature(lm35, 200);       // Reading the temperature in Celsius degrees 
   Entrada = C;
   myPID.Compute();
 
   Serial.print(C);
-  Serial.print("\n");
+  // Serial.print("\n");
 
   /************************************************
      turn the output pin on/off based on pid output
@@ -53,11 +63,11 @@ void loop()
     windowStartTime += WindowSize;
   }
   if (Saida > now - windowStartTime) {
-    digitalWrite(RelayPin, LOW);
-    Serial.print("LIGADO\n");
+    digitalWrite(RelayPin, HIGH);
+    Serial.print(" DESLIGADO\n");
   }
   else {
-    digitalWrite(RelayPin, HIGH);
-    Serial.print("DESLIGADO\n");
+    digitalWrite(RelayPin, LOW);
+    Serial.print(" LIGADO\n");
   }
 }
