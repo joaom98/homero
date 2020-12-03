@@ -6,7 +6,7 @@
 
 FanController fan(SENSOR_PIN, SENSOR_THRESHOLD, PWM_PIN); // Criando a instância do cooler
 
-#define VELOCIDADE 100  // Percentual da velocidade do cooler de 0 a 100
+#define VELOCIDADE 100 // Percentual da velocidade do cooler de 0 a 100
 /*
  * Velocidade máxima do cooler: 3200 RPM (100%)
  * 
@@ -15,7 +15,7 @@ FanController fan(SENSOR_PIN, SENSOR_THRESHOLD, PWM_PIN); // Criando a instânci
  */
 
 #include <EduIntro.h>
-#define LM35_PIN A0 // Pino de saida do LM35
+#define LM35_PIN A0 // Pino de saida do LM35 (Fio Verde do LM35 ligado na porta analógica A0)
 LM35 lm35(LM35_PIN);  // creating the object 'lm35' on pin A0
 double C;
 
@@ -28,6 +28,10 @@ double readTemperature (LM35 sensor, int samples) {
    return soma / samples;
 }
 
+int velocidadeMapeada( int velocidade ) {
+  return map(velocidade, 0, 100, 0, 65); // Valores descobertos empiricamente. O fan rodando a 60 na chamada de DutyCycle equilibra o lado frio em 1C
+}
+
 void setup()
 {
 
@@ -35,14 +39,19 @@ void setup()
   
   fan.begin(); // Iniciando o fan
 
+  Serial.println();
+  Serial.println("VELOCIDADE\tRPM\tTEMPERATURA");
+
 }
 
 void loop()
 {
-  
-  fan.setDutyCycle(VELOCIDADE); // Seleção de velocidade (mudar VELOCIDADE para uma variável que seja um numero entre 0 e 100)
 
-  Serial.print(VELOCIDADE);
+  int velocidade_final = velocidadeMapeada(VELOCIDADE);
+  
+  fan.setDutyCycle(velocidade_final); // Seleção de velocidade (mudar VELOCIDADE para uma variável que seja um numero entre 0 e 100)
+
+  Serial.print(velocidade_final);
   Serial.print("\t");
   Serial.print(fan.getSpeed());
   Serial.print("RPM\t");
