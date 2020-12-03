@@ -1,30 +1,31 @@
-#include <FanController.h>
+#include <FanController.h>      // Biblioteca que controla a velocidade de um cooler
 
-#define SENSOR_PIN 2 // Fio Verde
-#define SENSOR_THRESHOLD 1000
-#define PWM_PIN 9 // Fio Azul
-FanController fan(SENSOR_PIN, SENSOR_THRESHOLD, PWM_PIN);
+#define SENSOR_PIN 2            // Pino do sensor é o Digital 2 ligado no fio verde do cooler
+#define SENSOR_THRESHOLD 1000   // Constante para quantidade de leituras do tacômetro
+#define PWM_PIN 9               // Pino de controle de velocidade do cooler ligado no fio azul
 
-#define VELOCIDADE 100 // Numero de 0 a 100 que define a velocidade do cooler
+FanController fan(SENSOR_PIN, SENSOR_THRESHOLD, PWM_PIN); // Criando a instância do cooler
 
+#define VELOCIDADE 0  // Percentual da velocidade do cooler de 0 a 100
+/*
+ * Velocidade máxima do cooler: 3200 RPM (100%)
+ * 
+ * Velocidade mínima do cooler: 800 RPM  (0%)
+ * 
+ */
 void setup()
 {
 
-  Serial.begin(9600);
+  Serial.begin(9600); // Iniciando a comunicação serial
   
-  fan.begin();
-
-  // Get duty cycle
-  byte dutyCycle = fan.getDutyCycle();
-  Serial.print("Duty cycle: ");
-  Serial.println(dutyCycle, DEC);
+  fan.begin(); // Iniciando o fan
 
 }
 
 void loop()
 {
   
-  fan.setDutyCycle(VELOCIDADE);
+  fan.setDutyCycle(VELOCIDADE); // Seleção de velocidade (mudar VELOCIDADE para uma variável que seja um numero entre 0 e 100)
 
   Serial.print(VELOCIDADE);
   Serial.print("\t");

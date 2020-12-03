@@ -1,10 +1,8 @@
 #include <PID_v1.h>
-#define RelayPin 6
-
 #include <EduIntro.h>
 
+#define RelayPin 6
 LM35 lm35(A0);  // creating the object 'lm35' on pin A0
-
 double C;
 
 //Define Variables we'll be connecting to
