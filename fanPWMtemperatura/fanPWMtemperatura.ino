@@ -19,7 +19,7 @@ FanController fan(SENSOR_PIN, SENSOR_THRESHOLD, PWM_PIN); // Criando a instânci
 LM35 lm35(LM35_PIN);  // Criando o objeto 'lm35' no pino A0
 double C;
 
-double readTemperature (LM35 sensor, int amostras) // Função auxiliar para medir a temperatura
+double readTemperature (LM35 sensor, int amostras) // Função auxiliar para medir a temperatura (faz várias leituras e entrega uma média)
 {
   double soma = 0;
    for ( int i=0 ; i < amostras ; i++ ) {
@@ -42,24 +42,24 @@ int velocidadeMapeada( int velocidade ) // Função que relaciona a velocidade e
 void acionaBotao( int pino, int velocidade, int numero_botao ) // Função auxiliar que verifica se algum botão foi acionado, recebe o pino, a velocidade desejada e um numero para identificar o botao
 {
     if (digitalRead(pino) == true){
-    Serial.print("botao ");
-    Serial.print(numero_botao);
-    Serial.print(" apertado");
-    velocidade_final = velocidadeMapeada(velocidade);
-
-    // Print obtained value
-    Serial.print("Setting duty cycle: ");
-    Serial.println(velocidade_final, DEC);
-
-    // Set fan duty cycle
-    fan.setDutyCycle(velocidade_final);
-
-    // Get duty cycle
-    byte dutyCycle = fan.getDutyCycle();
-    Serial.print("Duty cycle: ");
-    Serial.println(dutyCycle, DEC);
-
-    delay(300);
+      Serial.print("botao ");
+      Serial.print(numero_botao);
+      Serial.print(" apertado");
+      velocidade_final = velocidadeMapeada(velocidade);
+  
+      // Print obtained value
+      Serial.print("Setting duty cycle: ");
+      Serial.println(velocidade_final, DEC);
+  
+      // Set fan duty cycle
+      fan.setDutyCycle(velocidade_final);
+  
+      // Get duty cycle
+      byte dutyCycle = fan.getDutyCycle();
+      Serial.print("Duty cycle: ");
+      Serial.println(dutyCycle, DEC);
+  
+      delay(300);
   }
 }
 
