@@ -6,7 +6,7 @@
 
 FanController fan(SENSOR_PIN, SENSOR_THRESHOLD, PWM_PIN); // Criando a instância do cooler
 
-#define VELOCIDADE 100 // Percentual da velocidade do cooler de 0 a 100
+#define VELOCIDADE 0 // Percentual da velocidade do cooler de 0 a 100
 /*
  * Velocidade máxima do cooler: 3200 RPM (100%)
  * 
