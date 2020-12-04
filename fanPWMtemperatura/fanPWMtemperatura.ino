@@ -16,29 +16,32 @@ FanController fan(SENSOR_PIN, SENSOR_THRESHOLD, PWM_PIN); // Criando a instânci
 
 #include <EduIntro.h>
 #define LM35_PIN A0 // Pino de saida do LM35 (Fio Verde do LM35 ligado na porta analógica A0)
-LM35 lm35(LM35_PIN);  // creating the object 'lm35' on pin A0
+LM35 lm35(LM35_PIN);  // Criando o objeto 'lm35' no pino A0
 double C;
 
-double readTemperature (LM35 sensor, int samples) {
+double readTemperature (LM35 sensor, int amostras) // Função auxiliar para medir a temperatura
+{
   double soma = 0;
-   for ( int i=0 ; i < samples ; i++ ) {
+   for ( int i=0 ; i < amostras ; i++ ) {
       soma += sensor.readCelsius(); 
    }
 
-   return soma / samples;
+   return soma / amostras;
 }
 
-int velocidade_final = velocidadeMapeada(VELOCIDADE);
+int velocidade_final = velocidadeMapeada(VELOCIDADE); // Utilizando variáveis globais para acessar seus valores em todas as funções
 int velocidade_real;
 
-int velocidadeMapeada( int velocidade ) {
+int velocidadeMapeada( int velocidade ) // Função que relaciona a velocidade em um percentual com os valores do cooler
+{ 
   velocidade_real = velocidade;
-  return map(velocidade, 0, 100, 0, 65); // Valores descobertos empiricamente. O fan rodando a 60 na chamada de DutyCycle equilibra o lado frio em 1C
+  return map(velocidade, 0, 100, 0, 65); // Valores descobertos empiricamente. O fan rodando a 65 na chamada de DutyCycle equilibra o lado frio em 1C
 }
 
 
-void acionaBotao( int botao, int velocidade, int numero_botao ) {
-    if (digitalRead(botao) == true){
+void acionaBotao( int pino, int velocidade, int numero_botao ) // Função auxiliar que verifica se algum botão foi acionado, recebe o pino, a velocidade desejada e um numero para identificar o botao
+{
+    if (digitalRead(pino) == true){
     Serial.print("botao ");
     Serial.print(numero_botao);
     Serial.print(" apertado");
@@ -67,7 +70,6 @@ void setup()
   
   fan.begin(); // Iniciando o fan
 
-  
   fan.setDutyCycle(velocidade_final); // Seleção de velocidade (mudar VELOCIDADE para uma variável que seja um numero entre 0 e 100)
 
   Serial.println();
@@ -85,6 +87,8 @@ void setup()
 void loop()
 {
 
+  // Imprimindo os valores na Serial
+
   Serial.print(velocidade_real);
   Serial.print("\t");
 
@@ -94,7 +98,7 @@ void loop()
   Serial.print(fan.getSpeed());
   Serial.print("\t");
 
-  C = readTemperature(lm35, 400);       // Reading the temperature in Celsius degrees
+  C = readTemperature(lm35, 400);       // Lendo a temperatura em Celsius
   Serial.println(C);
 
   acionaBotao( 7, 0, 1);
@@ -102,5 +106,5 @@ void loop()
   acionaBotao( 5, 70, 3);
   acionaBotao( 4, 100, 4);
 
-  delay(900);
+  delay(900); // Tentativa de entregar apenas uma leitura por segundo
 }
