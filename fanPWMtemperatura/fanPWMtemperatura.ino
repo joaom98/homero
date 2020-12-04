@@ -28,40 +28,21 @@ double readTemperature (LM35 sensor, int samples) {
    return soma / samples;
 }
 
+int velocidade_final = velocidadeMapeada(VELOCIDADE);
+int velocidade_real;
+
 int velocidadeMapeada( int velocidade ) {
+  velocidade_real = velocidade;
   return map(velocidade, 0, 100, 0, 65); // Valores descobertos empiricamente. O fan rodando a 60 na chamada de DutyCycle equilibra o lado frio em 1C
 }
 
 
-int velocidade_final = velocidadeMapeada(VELOCIDADE);
-
-void setup()
-{
-
-  Serial.begin(9600); // Iniciando a comunicação serial
-  
-  fan.begin(); // Iniciando o fan
-
-  
-  fan.setDutyCycle(velocidade_final); // Seleção de velocidade (mudar VELOCIDADE para uma variável que seja um numero entre 0 e 100)
-
-  Serial.println();
-  Serial.println("VELOCIDADE\tRPM\tTEMPERATURA");
-
-}
-
-void loop()
-{
-  Serial.print(fan.getSpeed());
-  Serial.print("RPM\t");
-
-  C = readTemperature(lm35, 200);       // Reading the temperature in Celsius degrees
-  Serial.println(C);
-
-  if (Serial.available() > 0) {
-    // Parse speed
-    int input = Serial.parseInt();
-    velocidade_final = velocidadeMapeada(input);
+void acionaBotao( int botao, int velocidade, int numero_botao ) {
+    if (digitalRead(botao) == true){
+    Serial.print("botao ");
+    Serial.print(numero_botao);
+    Serial.print(" apertado");
+    velocidade_final = velocidadeMapeada(velocidade);
 
     // Print obtained value
     Serial.print("Setting duty cycle: ");
@@ -75,7 +56,51 @@ void loop()
     Serial.print("Duty cycle: ");
     Serial.println(dutyCycle, DEC);
 
-    int trash = Serial.parseInt();
+    delay(300);
   }
+}
+
+void setup()
+{
+
+  Serial.begin(9600); // Iniciando a comunicação serial
   
+  fan.begin(); // Iniciando o fan
+
+  
+  fan.setDutyCycle(velocidade_final); // Seleção de velocidade (mudar VELOCIDADE para uma variável que seja um numero entre 0 e 100)
+
+  Serial.println();
+  Serial.println("VELOCIDADE_REAL\tPERCENTUAL_ACIONAMENTO\tRPM\tTEMPERATURA");
+
+  pinMode(7, INPUT); // Botoeira 1
+  pinMode(6, INPUT); // Botoeira 2
+  pinMode(5, INPUT); // Botoeira 3
+  pinMode(4, INPUT); // Botoeira 4
+  pinMode(3, OUTPUT); // 5V pra alimentar os botões
+  digitalWrite(3, HIGH); // Ligando os 5V
+
+}
+
+void loop()
+{
+
+  Serial.print(velocidade_real);
+  Serial.print("\t");
+
+  Serial.print(velocidade_final);
+  Serial.print("\t");
+
+  Serial.print(fan.getSpeed());
+  Serial.print("\t");
+
+  C = readTemperature(lm35, 400);       // Reading the temperature in Celsius degrees
+  Serial.println(C);
+
+  acionaBotao( 7, 0, 1);
+  acionaBotao( 6, 50, 2);
+  acionaBotao( 5, 70, 3);
+  acionaBotao( 4, 100, 4);
+
+  delay(900);
 }
