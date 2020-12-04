@@ -32,12 +32,18 @@ int velocidadeMapeada( int velocidade ) {
   return map(velocidade, 0, 100, 0, 65); // Valores descobertos empiricamente. O fan rodando a 60 na chamada de DutyCycle equilibra o lado frio em 1C
 }
 
+
+int velocidade_final = velocidadeMapeada(VELOCIDADE);
+
 void setup()
 {
 
   Serial.begin(9600); // Iniciando a comunicação serial
   
   fan.begin(); // Iniciando o fan
+
+  
+  fan.setDutyCycle(velocidade_final); // Seleção de velocidade (mudar VELOCIDADE para uma variável que seja um numero entre 0 e 100)
 
   Serial.println();
   Serial.println("VELOCIDADE\tRPM\tTEMPERATURA");
@@ -46,16 +52,30 @@ void setup()
 
 void loop()
 {
-
-  int velocidade_final = velocidadeMapeada(VELOCIDADE);
-  
-  fan.setDutyCycle(velocidade_final); // Seleção de velocidade (mudar VELOCIDADE para uma variável que seja um numero entre 0 e 100)
-
-  Serial.print(velocidade_final);
-  Serial.print("\t");
   Serial.print(fan.getSpeed());
   Serial.print("RPM\t");
 
   C = readTemperature(lm35, 200);       // Reading the temperature in Celsius degrees
   Serial.println(C);
+
+  if (Serial.available() > 0) {
+    // Parse speed
+    int input = Serial.parseInt();
+    velocidade_final = velocidadeMapeada(input);
+
+    // Print obtained value
+    Serial.print("Setting duty cycle: ");
+    Serial.println(velocidade_final, DEC);
+
+    // Set fan duty cycle
+    fan.setDutyCycle(velocidade_final);
+
+    // Get duty cycle
+    byte dutyCycle = fan.getDutyCycle();
+    Serial.print("Duty cycle: ");
+    Serial.println(dutyCycle, DEC);
+
+    int trash = Serial.parseInt();
+  }
+  
 }
