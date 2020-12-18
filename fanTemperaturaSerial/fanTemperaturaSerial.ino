@@ -55,6 +55,8 @@ void loop()
 
 
   C = readTemperature(lm35, 400);       // Lendo a temperatura em Celsius
+  
+  double *()
   Serial.write(C, 4);
   
   if (Serial.available() > 0) {
